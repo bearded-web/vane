@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+Disallow: /wordpress/admin/
+Disallow: /wordpress/wp-admin/
+Disallow: /wordpress/secret/
+Disallow: /Wordpress/wp-admin/
+Allow: /randomurl/
