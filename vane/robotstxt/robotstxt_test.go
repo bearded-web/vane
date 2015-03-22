@@ -54,7 +54,7 @@ func TestParseValidRobotsTxt(t *testing.T) {
 			"http://example.localhost/wordpress/wp-admin/",
 			"http://example.localhost/wordpress/secret/",
 			"http://example.localhost/Wordpress/wp-admin/",
-			"http://example.localhost/asdf/",
+			"http://example.localhost/randomurl/",
 		}
 	)
 

@@ -12,8 +12,12 @@ import (
 const robotsTxtFileName = "robots.txt"
 
 var (
-	robotsKnownDirs       = utils.NewStringSet("/", "/wp-admin/", "/wp-includes/", "/wp-content/")
-	robotsTxtEntryPattern = regexp.MustCompile(`/^(?:dis)?allow:\s*(.*)$/`)
+	robotsKnownDirs = utils.NewStringSet("/", "/wp-admin/", "/wp-includes/", "/wp-content/")
+
+	// (?mi) are options: multiline mode & case-insensitive
+	// ^(?:dis)?allow: 0 or 1 non captured `dis` group at the begining and allow
+	// \s* - skip all spaces before a matching group
+	robotsTxtPattern = regexp.MustCompile(`(?mi)^(?:dis)?allow:\s*(.*)$`)
 )
 
 type RobotsTxt interface {
@@ -88,7 +92,7 @@ func (r *robotsTxt) parseRobotsTxt(body []byte) ([]string, error) {
 	filteredUrls := urls[:0]
 	for _, item := range urls {
 		r.uri.Path = item
-		filteredUrls = append(filteredUrls, r.uri.Path)
+		filteredUrls = append(filteredUrls, r.uri.String())
 	}
 
 	return filteredUrls, nil
@@ -107,7 +111,7 @@ func getRobotsTxt(url string) ([]byte, error) {
 
 func parseRobotsTxt(body []byte) ([]string, error) {
 	// -1 means all
-	entries := robotsTxtEntryPattern.FindAll(body, -1)
+	entries := robotsTxtPattern.FindAllSubmatch(body, -1)
 	if entries == nil {
 		// it doens't match at all
 		// return empty slice
@@ -116,12 +120,12 @@ func parseRobotsTxt(body []byte) ([]string, error) {
 
 	matches := make([]string, 0, len(entries))
 	for _, entry := range entries {
-		if candidate := string(entry); !robotsKnownDirs.Contains(candidate) {
-			matches = append(matches)
+		candidate := string(entry[robotsTxtPattern.NumSubexp()])
+		if !robotsKnownDirs.Contains(candidate) {
+			matches = append(matches, candidate)
 		}
 		//ToDo: clear subdirs too
 		//ToDo: replace set with binary search and delete
 	}
-
 	return matches, nil
 }
