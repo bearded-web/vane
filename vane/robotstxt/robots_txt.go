@@ -1,6 +1,7 @@
 package robotstxt
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -16,6 +17,8 @@ var (
 	// ^(?:dis)?allow: 0 or 1 non captured `dis` group at the begining and allow
 	// \s* - skip all spaces before a matching group
 	robotsTxtPattern = regexp.MustCompile(`(?mi)^(?:dis)?allow:\s*(.*)$`)
+
+	errInvalidOrEmptyRobotsTxt = errors.New("invalid or empty robots.txt")
 )
 
 // RobotsTxt is an interface which wraps
@@ -63,7 +66,7 @@ func (r *robotsTxt) HasRobotsTxt() (bool, error) {
 	}
 	resp.Body.Close()
 
-	return resp.StatusCode == 200, nil
+	return resp.StatusCode == http.StatusOK, nil
 }
 
 func (r *robotsTxt) ParseRobotsTxt() ([]string, error) {
@@ -117,7 +120,7 @@ func parseRobotsTxt(body []byte) ([]string, error) {
 	if entries == nil {
 		// it doens't match at all
 		// return an empty slice
-		return []string{}, nil
+		return nil, errInvalidOrEmptyRobotsTxt
 	}
 
 	matches := make([]string, 0, len(entries))
