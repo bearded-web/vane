@@ -2,11 +2,10 @@ package robotstxt
 
 import (
 	"errors"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"regexp"
 
+	"github.com/bearded-web/vane/vane/site"
 	"github.com/bearded-web/vane/vane/utils"
 )
 
@@ -19,6 +18,7 @@ var (
 	robotsTxtPattern = regexp.MustCompile(`(?mi)^(?:dis)?allow:\s*(.*)$`)
 
 	errInvalidOrEmptyRobotsTxt = errors.New("invalid or empty robots.txt")
+	errNoRobotsTxt             = errors.New("no robots.txt")
 )
 
 // RobotsTxt is an interface which wraps
@@ -29,38 +29,25 @@ type RobotsTxt interface {
 }
 
 type robotsTxt struct {
-	uri *url.URL
+	site.Site
 }
 
 // NewRobotsTxt returns new RobotsTxt to work with
 // a site referenced by the given url
-func NewRobotsTxt(rawurl string) (RobotsTxt, error) {
-	return newRobotsTxt(rawurl)
+func NewRobotsTxt(s site.Site) (RobotsTxt, error) {
+	return newRobotsTxt(s)
 }
 
-func newRobotsTxt(rawurl string) (*robotsTxt, error) {
-	u, err := url.Parse(rawurl)
-	if err != nil {
-		return nil, err
-	}
-
+func newRobotsTxt(s site.Site) (*robotsTxt, error) {
 	r := &robotsTxt{
-		uri: u,
+		Site: s,
 	}
 
 	return r, nil
 }
 
-func (r *robotsTxt) robotsURL() string {
-	if r.uri.Path != "/robots.txt" {
-		r.uri.Path = "/robots.txt"
-	}
-	//ToDo: cache this value
-	return r.uri.String()
-}
-
 func (r *robotsTxt) HasRobotsTxt() (bool, error) {
-	resp, err := http.Head(r.robotsURL())
+	resp, err := r.Site.Head("robots.txt")
 	if err != nil {
 		return false, err
 	}
@@ -70,19 +57,24 @@ func (r *robotsTxt) HasRobotsTxt() (bool, error) {
 }
 
 func (r *robotsTxt) ParseRobotsTxt() ([]string, error) {
-	if has, err := r.HasRobotsTxt(); !has || err != nil {
-		return nil, err
-	}
-
-	body, err := getRobotsTxt(r.robotsURL())
+	has, err := r.HasRobotsTxt()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.parseRobotsTxt(body)
+	if !has {
+		return nil, errNoRobotsTxt
+	}
+
+	body, err := r.GetBody("robots.txt")
+	if err != nil {
+		return nil, err
+	}
+
+	return r.getUrlsFromRobotsTxt(body)
 }
 
-func (r *robotsTxt) parseRobotsTxt(body []byte) ([]string, error) {
+func (r *robotsTxt) getUrlsFromRobotsTxt(body []byte) ([]string, error) {
 	urls, err := parseRobotsTxt(body)
 	if err != nil {
 		return nil, err
@@ -96,22 +88,10 @@ func (r *robotsTxt) parseRobotsTxt(body []byte) ([]string, error) {
 
 	filteredUrls := urls[:0]
 	for _, item := range urls {
-		r.uri.Path = item
-		filteredUrls = append(filteredUrls, r.uri.String())
+		filteredUrls = append(filteredUrls, r.Site.URLFor(item))
 	}
 
 	return filteredUrls, nil
-}
-
-func getRobotsTxt(url string) ([]byte, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	return body, err
 }
 
 func parseRobotsTxt(body []byte) ([]string, error) {

@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/bearded-web/vane/vane/site"
 )
 
 var robotsfixtures = os.Getenv("FIXTURESPATH") + "/robotstxt/"
@@ -20,23 +22,6 @@ func getExpectedUrl(base string) []string {
 		base + "/Wordpress/wp-admin/",
 		base + "/randomurl/",
 	}
-}
-
-func TestGeneratedUrl(t *testing.T) {
-	var (
-		siteURIWithoutSlash = "http://example.com"
-		siteURIWithSlash    = siteURIWithoutSlash + "/"
-
-		expectedURL = siteURIWithSlash + "robots.txt"
-	)
-
-	r, err := newRobotsTxt(siteURIWithoutSlash)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedURL, r.robotsURL())
-
-	r, err = newRobotsTxt(siteURIWithSlash)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedURL, r.robotsURL())
 }
 
 func TestParseEmptyRobotsTxt(t *testing.T) {
@@ -64,7 +49,9 @@ func TestParseValidRobotsTxt(t *testing.T) {
 		expectedValidResult = getExpectedUrl("http://example.localhost")
 	)
 
-	r, err := newRobotsTxt("http://example.localhost")
+	s, _ := site.NewSite("http://example.localhost")
+
+	r, err := newRobotsTxt(s)
 	if !assert.NoError(t, err, "unable to create client") {
 		t.FailNow()
 	}
@@ -74,7 +61,7 @@ func TestParseValidRobotsTxt(t *testing.T) {
 		t.FailNow()
 	}
 
-	result, err := r.parseRobotsTxt(valid)
+	result, err := r.getUrlsFromRobotsTxt(valid)
 	assert.NoError(t, err, "unexpected error during parsing valid_robots.txt")
 	assert.Equal(t, expectedValidResult, result)
 }
@@ -87,7 +74,8 @@ func TestNoRobotsTxt(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	r, err := NewRobotsTxt(ts.URL)
+	s, _ := site.NewSite(ts.URL)
+	r, err := NewRobotsTxt(s)
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
@@ -128,7 +116,9 @@ func TestRobotsTxt(t *testing.T) {
 
 	t.Log(validRobotsPath, expectedValidResult)
 
-	r, err := NewRobotsTxt(ts.URL)
+	s, _ := site.NewSite(ts.URL)
+
+	r, err := NewRobotsTxt(s)
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
