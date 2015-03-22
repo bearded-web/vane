@@ -12,19 +12,19 @@ var robotsfixtures = os.Getenv("FIXTURESPATH") + "/robotstxt/"
 
 func TestGeneratedUrl(t *testing.T) {
 	var (
-		siteUriWithoutSlash = "http://example.com"
-		siteUriWithSlash    = siteUriWithoutSlash + "/"
+		siteURIWithoutSlash = "http://example.com"
+		siteURIWithSlash    = siteURIWithoutSlash + "/"
 
-		expectedUrl = siteUriWithSlash + "robots.txt"
+		expectedURL = siteURIWithSlash + "robots.txt"
 	)
 
-	r, err := newRobotsTxt(siteUriWithoutSlash)
+	r, err := newRobotsTxt(siteURIWithoutSlash)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedUrl, r.robotsUrl())
+	assert.Equal(t, expectedURL, r.robotsURL())
 
-	r, err = newRobotsTxt(siteUriWithSlash)
+	r, err = newRobotsTxt(siteURIWithSlash)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedUrl, r.robotsUrl())
+	assert.Equal(t, expectedURL, r.robotsURL())
 }
 
 func TestParseEmptyRobotsTxt(t *testing.T) {
@@ -60,12 +60,12 @@ func TestParseValidRobotsTxt(t *testing.T) {
 
 	r, err := newRobotsTxt("http://example.localhost")
 	if !assert.NoError(t, err, "unable to create client") {
-		t.Fatal()
+		t.FailNow()
 	}
 
 	valid, err := ioutil.ReadFile(validRobotsPath)
 	if !assert.NoError(t, err, "unable to read valid_robots.txt") {
-		t.Fatal()
+		t.FailNow()
 	}
 
 	result, err := r.parseRobotsTxt(valid)

@@ -9,8 +9,6 @@ import (
 	"github.com/bearded-web/vane/vane/utils"
 )
 
-const robotsTxtFileName = "robots.txt"
-
 var (
 	robotsKnownDirs = utils.NewStringSet("/", "/wp-admin/", "/wp-includes/", "/wp-content/")
 
@@ -20,6 +18,8 @@ var (
 	robotsTxtPattern = regexp.MustCompile(`(?mi)^(?:dis)?allow:\s*(.*)$`)
 )
 
+// RobotsTxt is an interface which wraps
+// operations with robots.txt
 type RobotsTxt interface {
 	HasRobotsTxt() (bool, error)
 	ParseRobotsTxt() ([]string, error)
@@ -29,6 +29,8 @@ type robotsTxt struct {
 	uri *url.URL
 }
 
+// NewRobotsTxt returns new RobotsTxt to work with
+// a site referenced by the given url
 func NewRobotsTxt(rawurl string) (RobotsTxt, error) {
 	return newRobotsTxt(rawurl)
 }
@@ -46,7 +48,7 @@ func newRobotsTxt(rawurl string) (*robotsTxt, error) {
 	return r, nil
 }
 
-func (r *robotsTxt) robotsUrl() string {
+func (r *robotsTxt) robotsURL() string {
 	if r.uri.Path != "/robots.txt" {
 		r.uri.Path = "/robots.txt"
 	}
@@ -55,7 +57,7 @@ func (r *robotsTxt) robotsUrl() string {
 }
 
 func (r *robotsTxt) HasRobotsTxt() (bool, error) {
-	resp, err := http.Head(r.robotsUrl())
+	resp, err := http.Head(r.robotsURL())
 	if err != nil {
 		return false, err
 	}
@@ -69,7 +71,7 @@ func (r *robotsTxt) ParseRobotsTxt() ([]string, error) {
 		return nil, err
 	}
 
-	body, err := getRobotsTxt(r.robotsUrl())
+	body, err := getRobotsTxt(r.robotsURL())
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +116,7 @@ func parseRobotsTxt(body []byte) ([]string, error) {
 	entries := robotsTxtPattern.FindAllSubmatch(body, -1)
 	if entries == nil {
 		// it doens't match at all
-		// return empty slice
+		// return an empty slice
 		return []string{}, nil
 	}
 
@@ -125,7 +127,7 @@ func parseRobotsTxt(body []byte) ([]string, error) {
 			matches = append(matches, candidate)
 		}
 		//ToDo: clear subdirs too
-		//ToDo: replace set with binary search and delete
+		//ToDo: replace the set with a binary search and delete
 	}
 	return matches, nil
 }

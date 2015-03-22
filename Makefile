@@ -3,7 +3,7 @@
 
 export FIXTURESPATH=$(shell pwd)/fixtures
 
-all: test lint vet fmt
+all: test vet fmt
 
 
 travis: all
