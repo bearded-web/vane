@@ -11,7 +11,7 @@ travis: all
 
 test:
 	@echo "+ $@"
-	@go test -cover ./...
+	@go test -cover -v ./...
 
 
 lint:

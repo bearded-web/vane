@@ -114,8 +114,6 @@ func TestRobotsTxt(t *testing.T) {
 		expectedValidResult = getExpectedUrl(ts.URL)
 	)
 
-	t.Log(validRobotsPath, expectedValidResult)
-
 	s, _ := site.NewSite(ts.URL)
 
 	r, err := NewRobotsTxt(s)
