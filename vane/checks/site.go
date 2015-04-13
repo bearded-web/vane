@@ -2,10 +2,12 @@ package checks
 
 import (
 	"bytes"
+	hash "crypto/md5"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/bearded-web/vane/vane/site"
+	"github.com/bearded-web/vane/vane/utils"
 )
 
 var testXMLrpc = []byte("XML-RPC server accepts POST requests only")
@@ -45,4 +47,30 @@ func HasBasicAuth(s site.Site) (bool, error) {
 	}
 
 	return req.StatusCode == http.StatusUnauthorized, nil
+}
+
+func pageHash(s site.Site, path string) (h [hash.Size]byte, err error) {
+	// ToDo: check redirections here
+	req, err := s.Get(path)
+	if err != nil {
+		return
+	}
+	defer req.Body.Close()
+
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return
+	}
+
+	return hash.Sum(body), err
+}
+
+func HomepageHash(s site.Site) ([hash.Size]byte, error) {
+	return pageHash(s, "/")
+}
+
+func Error404Hash(s site.Site) ([hash.Size]byte, error) {
+	randompage := make([]byte, 64)
+	utils.ReadRandomBytes(randompage)
+	return pageHash(s, string(randompage))
 }
