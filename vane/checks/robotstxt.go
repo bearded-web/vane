@@ -1,4 +1,4 @@
-package robotstxt
+package checks
 
 import (
 	"errors"
