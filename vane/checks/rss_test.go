@@ -18,9 +18,25 @@ func TestRSS(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write(fakeBody)
 	}))
+	defer ts.Close()
 
 	s, _ := site.NewSite(ts.URL)
 	link, err := RSSURL(s)
 	assert.NoError(t, err)
 	assert.Equal(t, "http://lamp-wp/wordpress-3.5/?feed=rss2", link)
+}
+
+func TestNoRSS(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	}))
+	defer ts.Close()
+
+	s, _ := site.NewSite(ts.URL)
+	link, err := RSSURL(s)
+	assert.NoError(t, err)
+	assert.Empty(t, link)
+
+	s, _ = site.NewSite("http://127.0.0.1:9999/")
+	_, err = RSSURL(s)
+	assert.Error(t, err)
 }
