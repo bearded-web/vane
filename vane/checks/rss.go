@@ -17,6 +17,10 @@ func RSSURL(s site.Site) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	link := rssPattern.Find(body)
-	return string(link), nil
+	submatches := rssPattern.FindSubmatch(body)
+	if len(submatches) == 2 {
+		return string(submatches[1]), nil
+	}
+
+	return "", nil
 }

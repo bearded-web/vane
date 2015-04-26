@@ -22,5 +22,5 @@ func TestRSS(t *testing.T) {
 	s, _ := site.NewSite(ts.URL)
 	link, err := RSSURL(s)
 	assert.NoError(t, err)
-	assert.Equal(t, s.URLFor("wordpress-3.5/?feed=rss2"), link)
+	assert.Equal(t, "http://lamp-wp/wordpress-3.5/?feed=rss2", link)
 }
