@@ -15,7 +15,6 @@ import (
 )
 
 //ToDO: add assert messages
-var readmefixtures = os.Getenv("FIXTURESPATH") + "/readme/"
 
 func TestReadMeBadStatus(t *testing.T) {
 	buff := bytes.NewBuffer(nil)

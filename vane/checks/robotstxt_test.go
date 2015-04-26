@@ -4,15 +4,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/bearded-web/vane/vane/site"
 )
-
-var robotsfixtures = os.Getenv("FIXTURESPATH") + "/robotstxt/"
 
 func getExpectedUrl(base string) []string {
 	return []string{

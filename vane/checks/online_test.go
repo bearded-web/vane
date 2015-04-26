@@ -1,7 +1,6 @@
 package checks
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,7 +12,6 @@ import (
 
 func TestOnline500x(t *testing.T) {
 	tsOk := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Sprintf("OK", w)
 	}))
 	defer tsOk.Close()
 
