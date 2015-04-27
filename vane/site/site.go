@@ -12,6 +12,7 @@ type Site interface {
 	Get(path string) (*http.Response, error)
 	GetBody(path string) ([]byte, error)
 	Head(path string) (*http.Response, error)
+	Do(*http.Request) (*http.Response, error)
 }
 
 type site struct {
@@ -58,4 +59,8 @@ func (s *site) GetBody(path string) ([]byte, error) {
 
 func (s *site) Head(path string) (*http.Response, error) {
 	return s.client.Head(s.URLFor(path))
+}
+
+func (s *site) Do(req *http.Request) (*http.Response, error) {
+	return s.client.Do(req)
 }
