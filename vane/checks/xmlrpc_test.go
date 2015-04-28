@@ -14,7 +14,7 @@ import (
 func TestXMLRPCTrue(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/xmlrpc.php" {
-			t.Fatalf("requested URL is wrong", r.URL.Path)
+			t.Fatalf("requested URL %s is wrong", r.URL.Path)
 			return
 		}
 		// The body is lower cased as we match in a case insensitive way
@@ -31,7 +31,7 @@ func TestXMLRPCTrue(t *testing.T) {
 func TestXMLRPCFalse(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/xmlrpc.php" {
-			t.Fatalf("requested URL is wrong", r.URL.Path)
+			t.Fatalf("requested URL %s is wrong", r.URL.Path)
 			return
 		}
 	}))
