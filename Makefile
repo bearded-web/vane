@@ -6,7 +6,11 @@ export FIXTURESPATH=$(shell pwd)/fixtures
 all: test vet fmt
 
 
-travis: all
+travis: deps all
+
+
+deps:
+	@go get -t ./...
 
 
 test:
