@@ -29,7 +29,7 @@ func TestOnline500x(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, Online(s))
 
-	s, err = site.NewSite("http://127.0.0.1:9999")
+	s, err = site.NewSite(fakeHTTPaddress)
 	assert.NoError(t, err)
 	assert.False(t, Online(s))
 }

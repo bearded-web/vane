@@ -36,7 +36,7 @@ func TestNoRSS(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Empty(t, link)
 
-	s, _ = site.NewSite("http://127.0.0.1:9999/")
+	s, _ = site.NewSite("fakeHTTPaddress/")
 	_, err = RSSURL(s)
 	assert.Error(t, err)
 }

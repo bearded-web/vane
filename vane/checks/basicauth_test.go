@@ -33,7 +33,7 @@ func TestHasBacicAuth(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, has)
 
-	s, _ = site.NewSite("http://127.0.0.1:999/")
+	s, _ = site.NewSite("fakeHTTPaddress/")
 	_, err = HasBasicAuth(s)
 	assert.Error(t, err)
 }

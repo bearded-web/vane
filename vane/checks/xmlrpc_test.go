@@ -44,7 +44,7 @@ func TestXMLRPCFalse(t *testing.T) {
 }
 
 func TestXMLRPCError(t *testing.T) {
-	s, _ := site.NewSite("http://127.0.0.1:99999")
+	s, _ := site.NewSite("fakeHTTPaddress9")
 	_, err := HasXMLrpc(s)
 	assert.Error(t, err)
 }

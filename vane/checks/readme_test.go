@@ -81,7 +81,7 @@ func TestHasReadme(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, has)
 
-	s, _ = site.NewSite("http://127.0.0.1:9999")
+	s, _ = site.NewSite(fakeHTTPaddress)
 	has, err = HasReadMe(s)
 	assert.Error(t, err)
 }
